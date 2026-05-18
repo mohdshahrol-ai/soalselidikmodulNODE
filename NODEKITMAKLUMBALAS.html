@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Maklum Balas Bengkel NODE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Pustaka untuk menukar Markdown kepada HTML bagi respons AI -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        
+        .likert-radio input[type="radio"] { display: none; }
+        .likert-radio label {
+            display: inline-flex; justify-content: center; align-items: center;
+            width: 40px; height: 40px; border-radius: 50%;
+            border: 2px solid #d1d5db; background-color: white; color: #4b5563;
+            cursor: pointer; transition: all 0.2s; font-weight: 600;
+        }
+        .likert-radio input[type="radio"]:checked + label {
+            background-color: #4f46e5; border-color: #4f46e5; color: white;
+            transform: scale(1.1); box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.4);
+        }
+        .likert-radio label:hover { border-color: #4f46e5; }
+        .step-transition { transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; }
+
+        /* Format untuk kandungan AI */
+        .ai-content h1, .ai-content h2, .ai-content h3 { font-weight: bold; color: #374151; margin-top: 1rem; margin-bottom: 0.5rem; }
+        .ai-content p { margin-bottom: 0.75rem; color: #4b5563; }
+        .ai-content ul, .ai-content ol { margin-left: 1.5rem; margin-bottom: 1rem; color: #4b5563; }
+        .ai-content ul { list-style-type: disc; }
+        .ai-content ol { list-style-type: decimal; }
+        .ai-content strong { color: #111827; }
+    </style>
+</head>
+<body class="antialiased text-gray-800">
+
+<!-- ========================================== -->
+<!-- PAPARAN PENGGUNA (BORANG MAKLUM BALAS)     -->
+<!-- ========================================== -->
+<div id="user-view" class="max-w-4xl mx-auto my-8 px-4 sm:px-6">
+    <div class="bg-white rounded-t-2xl shadow-sm p-6 sm:p-10 border-b-4 border-indigo-600 text-center">
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Maklum Balas Bengkel</h1>
+        <p class="text-gray-600 text-sm sm:text-base">Latihan Profesional Pembangunan Kit NODE: Sumber PdP Dwi-Mod (Versi ADDIE)</p>
+    </div>
+
+    <!-- Progress Indicator -->
+    <div class="bg-white shadow-sm px-6 py-4 flex justify-between items-center text-xs sm:text-sm font-medium text-gray-500 relative">
+        <div class="absolute top-1/2 left-0 w-full h-1 bg-gray-200 -z-10 -translate-y-1/2"></div>
+        <div class="absolute top-1/2 left-0 h-1 bg-indigo-600 -z-10 -translate-y-1/2 transition-all duration-300" id="progress-bar" style="width: 25%"></div>
+        
+        <div class="flex flex-col items-center bg-white px-2">
+            <div id="icon-step-1" class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center mb-1 ring-4 ring-white shadow"><i class="fas fa-user"></i></div>
+            <span class="hidden sm:block text-indigo-700">Profil</span>
+        </div>
+        <div class="flex flex-col items-center bg-white px-2">
+            <div id="icon-step-2" class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center mb-1 ring-4 ring-white transition-colors duration-300"><i class="fas fa-book"></i></div>
+            <span class="hidden sm:block" id="text-step-2">Modul</span>
+        </div>
+        <div class="flex flex-col items-center bg-white px-2">
+            <div id="icon-step-3" class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center mb-1 ring-4 ring-white transition-colors duration-300"><i class="fas fa-cogs"></i></div>
+            <span class="hidden sm:block" id="text-step-3">Produk Akhir</span>
+        </div>
+        <div class="flex flex-col items-center bg-white px-2">
+            <div id="icon-step-4" class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center mb-1 ring-4 ring-white transition-colors duration-300"><i class="fas fa-comment-dots"></i></div>
+            <span class="hidden sm:block" id="text-step-4">Refleksi</span>
+        </div>
+    </div>
+
+    <!-- Form Container -->
+    <div class="bg-white rounded-b-2xl shadow-md p-6 sm:p-10 relative min-h-[400px]">
+        <form id="feedbackForm">
+            <!-- Langkah 1-4 (Sama seperti sebelumnya) -->
+            <div id="step-1" class="step-content opacity-100 transform translate-x-0">
+                <h2 class="text-xl font-semibold mb-4 text-indigo-700 border-b pb-2"><i class="fas fa-info-circle mr-2"></i>Bahagian A: Maklumat Peserta</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nama Penuh</label>
+                        <input type="text" name="nama" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Masukkan nama anda">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nama Sekolah</label>
+                        <input type="text" name="sekolah" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Cth: SMK Seri Bintang">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Kategori Sekolah</label>
+                        <select name="kategori_sekolah" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white">
+                            <option value="">-- Sila Pilih --</option>
+                            <option value="Bandar / Pinggir Bandar">Bandar / Pinggir Bandar</option>
+                            <option value="Luar Bandar / Pedalaman">Luar Bandar / Pedalaman</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Mata Pelajaran (Modul)</label>
+                        <input type="text" name="subjek" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Cth: Sains Tingkatan 1">
+                    </div>
+                </div>
+            </div>
+
+            <div id="step-2" class="step-content hidden opacity-0 transform translate-x-4 absolute top-6 left-6 right-6">
+                <h2 class="text-xl font-semibold mb-2 text-indigo-700 border-b pb-2"><i class="fas fa-book-open mr-2"></i>Bahagian B: Penilaian Modul Latihan</h2>
+                <h3 class="font-medium text-gray-800 mb-4 bg-gray-100 px-3 py-2 rounded mt-4">B1: Keberkesanan Modul Latihan</h3>
+                <div class="space-y-4 mb-6" id="b1-questions"></div>
+                <h3 class="font-medium text-gray-800 mb-4 bg-gray-100 px-3 py-2 rounded">B2: Kesesuaian Kandungan</h3>
+                <div class="space-y-4 mb-6" id="b2-questions"></div>
+                <h3 class="font-medium text-gray-800 mb-4 bg-gray-100 px-3 py-2 rounded">B3: Pelaksanaan Bengkel</h3>
+                <div class="space-y-4 mb-6" id="b3-questions"></div>
+            </div>
+
+            <div id="step-3" class="step-content hidden opacity-0 transform translate-x-4 absolute top-6 left-6 right-6">
+                <h2 class="text-xl font-semibold mb-2 text-indigo-700 border-b pb-2"><i class="fas fa-medal mr-2"></i>Bahagian C: Kualiti Produk Akhir</h2>
+                <div class="space-y-4 mb-8 mt-4" id="c-questions"></div>
+            </div>
+
+            <div id="step-4" class="step-content hidden opacity-0 transform translate-x-4 absolute top-6 left-6 right-6">
+                <h2 class="text-xl font-semibold mb-4 text-indigo-700 border-b pb-2"><i class="fas fa-comments mr-2"></i>Bahagian D: Maklum Balas Terbuka</h2>
+                <div class="space-y-4 mt-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">1. Topik paling mudah difahami & bermanfaat?</label>
+                        <textarea name="d_1" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">2. Bahagian paling mengelirukan/sukar?</label>
+                        <textarea name="d_2" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">3. Cadangan penambahbaikan untuk masa hadapan?</label>
+                        <textarea name="d_3" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">4. Sokongan/latihan lanjutan yang diperlukan?</label>
+                        <textarea name="d_4" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">5. Komen tambahan (jika ada):</label>
+                        <textarea name="d_5" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="mt-8 border-t pt-4 flex justify-between items-center" id="nav-buttons">
+                <button type="button" id="btn-prev" class="px-6 py-2 border-2 border-gray-300 rounded-lg font-medium hover:bg-gray-50 hidden"><i class="fas fa-arrow-left mr-2"></i> Kembali</button>
+                <div class="flex-grow"></div>
+                <button type="button" id="btn-next" class="px-6 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 shadow-md">Seterusnya <i class="fas fa-arrow-right ml-2"></i></button>
+                <button type="submit" id="btn-submit" class="px-8 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 shadow-md hidden"><i class="fas fa-paper-plane mr-2"></i> Hantar</button>
+            </div>
+            
+            <div id="error-msg" class="hidden mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded text-sm">Sila jawab semua soalan skala yang dipaparkan.</div>
+        </form>
+
+        <!-- Overlays -->
+        <div id="loading-overlay" class="hidden absolute inset-0 bg-white/90 backdrop-blur-sm rounded-b-2xl flex flex-col justify-center items-center z-50">
+            <i class="fas fa-circle-notch fa-spin text-4xl text-indigo-600 mb-4"></i>
+            <h3 class="text-xl font-bold">Sedang Menghantar...</h3>
+        </div>
+        <div id="success-overlay" class="hidden absolute inset-0 bg-white rounded-b-2xl flex flex-col justify-center items-center z-50 p-6 text-center">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4"><i class="fas fa-check text-3xl text-green-500"></i></div>
+            <h3 class="text-2xl font-bold mb-2">Berjaya!</h3>
+            <p class="text-gray-600 mb-6">Terima kasih atas maklum balas anda.</p>
+            <button type="button" onclick="window.location.reload()" class="px-6 py-2 border border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50">Kembali</button>
+        </div>
+    </div>
+    
+    <!-- Link to Admin -->
+    <div class="text-center mt-6">
+        <a href="#admin" class="text-xs text-gray-400 hover:text-indigo-500 transition-colors"><i class="fas fa-lock mr-1"></i>Akses Admin</a>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- PAPARAN ADMIN (DASHBOARD & AI ANALYSIS)    -->
+<!-- ========================================== -->
+<div id="admin-view" class="hidden max-w-7xl mx-auto my-8 px-4 sm:px-6">
+    
+    <!-- Admin Header -->
+    <div class="flex justify-between items-center bg-gray-900 text-white p-6 rounded-t-2xl shadow-lg">
+        <div>
+            <h1 class="text-2xl font-bold"><i class="fas fa-chart-line mr-3"></i>Dashboard Analitik Bengkel</h1>
+            <p class="text-gray-400 text-sm mt-1">Laporan Langsung & Analisis AI Gemini</p>
+        </div>
+        <a href="#" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm font-medium">
+            <i class="fas fa-home mr-2"></i>Borang Utama
+        </a>
+    </div>
+
+    <!-- Admin Loading State -->
+    <div id="admin-loading" class="bg-white p-12 text-center rounded-b-2xl shadow-lg">
+        <i class="fas fa-circle-notch fa-spin text-4xl text-indigo-600 mb-4"></i>
+        <p class="text-gray-600 font-medium">Memuat turun data dari pelayan...</p>
+    </div>
+
+    <!-- Admin Content -->
+    <div id="admin-content" class="hidden bg-gray-50 rounded-b-2xl shadow-lg border border-gray-200 p-6">
+        
+        <!-- Top Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-indigo-500">
+                <p class="text-sm text-gray-500 font-medium">Jumlah Peserta</p>
+                <p class="text-3xl font-bold text-gray-800" id="stat-total">0</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-500">
+                <p class="text-sm text-gray-500 font-medium">Purata: Keberkesanan Modul</p>
+                <p class="text-3xl font-bold text-gray-800" id="stat-b1">0.0</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-green-500">
+                <p class="text-sm text-gray-500 font-medium">Purata: Pelaksanaan Fasi</p>
+                <p class="text-3xl font-bold text-gray-800" id="stat-b3">0.0</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-purple-500">
+                <p class="text-sm text-gray-500 font-medium">Purata: Kualiti Produk Akhir</p>
+                <p class="text-3xl font-bold text-gray-800" id="stat-c">0.0</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column: AI Analysis -->
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                    <div class="flex justify-between items-center mb-4 border-b pb-4">
+                        <h2 class="text-xl font-bold text-gray-800"><i class="fas fa-robot text-indigo-600 mr-2"></i>Analisis Kualitatif AI (Gemini)</h2>
+                        <button id="btn-analyze-ai" class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg text-sm font-bold shadow hover:opacity-90 transition">
+                            <i class="fas fa-magic mr-2"></i>Jana Laporan
+                        </button>
+                    </div>
+                    
+                    <div id="ai-placeholder" class="text-center py-12 text-gray-400">
+                        <i class="fas fa-brain text-5xl mb-4 opacity-50"></i>
+                        <p>Klik butang "Jana Laporan" untuk membiarkan Gemini Menganalisis<br>kesemua komen terbuka peserta (Bahagian D).</p>
+                    </div>
+
+                    <div id="ai-result" class="hidden ai-content p-4 bg-indigo-50/50 rounded-xl border border-indigo-100 text-sm overflow-y-auto max-h-[500px]">
+                        <!-- AI content will be injected here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Recent Participants List -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 overflow-y-auto max-h-[650px]">
+                <h2 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2"><i class="fas fa-list text-gray-500 mr-2"></i>Senarai Peserta</h2>
+                <div id="participant-list" class="space-y-3">
+                    <!-- Participant list injected here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==========================================
+    // KONFIGURASI SISTEM UTAMA
+    // ==========================================
+    // Web App URL baharu yang diminta oleh pengguna
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby31V-8stteL7YcrEr7r0Ym6jVX9Knlrx8u02iq-_I3aeDrOES-XpFRDwh0OcQyN_Ym/exec";
+    const apiKey = ""; // Disuntik oleh persekitaran (Environment)
+    let globalAdminData = [];
+
+    // ==========================================
+    // LOGIK BORANG (PAPARAN PENGGUNA)
+    // ==========================================
+    const questions = {
+        b1: [
+            { id: 'b1_1', text: 'Susunan kandungan modul latihan ini teratur dan mudah difahami.' },
+            { id: 'b1_2', text: 'Penerangan ADDIE dalam modul membantu saya merancang dengan sistematik.' },
+            { id: 'b1_3', text: 'Contoh prompt AI sangat jelas dan mudah diaplikasikan.' },
+            { id: 'b1_4', text: 'Panduan "Kamus Teknikal" membantu kelancaran fasa Pembangunan.' }
+        ],
+        b2: [
+            { id: 'b2_1', text: 'Objektif pembangunan Kit NODE dinyatakan dengan jelas.' },
+            { id: 'b2_2', text: 'Kandungan modul sangat relevan dengan penyelesaian masalah internet.' },
+            { id: 'b2_3', text: 'Penggunaan AI benar-benar mempercepatkan proses persediaan PdP saya.' }
+        ],
+        b3: [
+            { id: 'b3_1', text: 'Peruntukan masa 2 hari adalah mencukupi.' },
+            { id: 'b3_2', text: 'Bimbingan fasilitator sangat berkesan menangani masalah teknikal.' }
+        ],
+        c: [
+            { id: 'c_1', text: 'Penjajaran DSKP menepati Standard Kandungan.' },
+            { id: 'c_2', text: 'Kesesuaian Dwi-Mod (Offline/Unplugged) berkesan.' },
+            { id: 'c_3', text: 'Berjaya menghasilkan nota, simulasi, dan kuiz HTML.' },
+            { id: 'c_4', text: 'Penyatuan Sistem (Single-File Application) berjaya.' },
+            { id: 'c_5', text: 'Fungsi log masuk dan JSON berfungsi.' },
+            { id: 'c_6', text: 'Kebolehlaksanaan (Praktikal di bilik darjah).' }
+        ]
+    };
+
+    function renderLikert(containerId, dataArray) {
+        const container = document.getElementById(containerId);
+        dataArray.forEach((q, index) => {
+            let html = `
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-white border border-gray-200 shadow-sm rounded-xl">
+                    <p class="text-sm text-gray-700 sm:w-1/2 mb-3 sm:mb-0">${index + 1}. ${q.text}</p>
+                    <div class="flex justify-end space-x-2 likert-radio">
+            `;
+            for(let i=1; i<=5; i++) {
+                html += `<div class="flex flex-col items-center">
+                            <input type="radio" id="${q.id}_${i}" name="${q.id}" value="${i}">
+                            <label for="${q.id}_${i}">${i}</label>
+                         </div>`;
+            }
+            html += `</div></div>`;
+            container.innerHTML += html;
+        });
+    }
+
+    renderLikert('b1-questions', questions.b1);
+    renderLikert('b2-questions', questions.b2);
+    renderLikert('b3-questions', questions.b3);
+    renderLikert('c-questions', questions.c);
+
+    let currentStep = 1;
+    const totalSteps = 4;
+    
+    function updateUI() {
+        for(let i=1; i<=totalSteps; i++) {
+            const stepEl = document.getElementById(`step-${i}`);
+            stepEl.classList.remove('opacity-100', 'translate-x-0', 'relative');
+            stepEl.classList.add('opacity-0', 'translate-x-4', 'hidden', 'absolute');
+            
+            const icon = document.getElementById(`icon-step-${i}`);
+            if(i < currentStep) {
+                icon.className = "w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center mb-1 ring-4 ring-white shadow";
+                icon.innerHTML = '<i class="fas fa-check"></i>';
+            } else if (i === currentStep) {
+                icon.className = "w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center mb-1 ring-4 ring-white shadow";
+            } else {
+                icon.className = "w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center mb-1 ring-4 ring-white";
+            }
+        }
+
+        const activeStep = document.getElementById(`step-${currentStep}`);
+        activeStep.classList.remove('hidden', 'absolute');
+        activeStep.classList.add('relative');
+        setTimeout(() => {
+            activeStep.classList.remove('opacity-0', 'translate-x-4');
+            activeStep.classList.add('opacity-100', 'translate-x-0', 'step-transition');
+        }, 50);
+
+        document.getElementById('progress-bar').style.width = `${((currentStep - 1) / (totalSteps - 1)) * 100}%`;
+        
+        document.getElementById('btn-prev').classList.toggle('hidden', currentStep === 1);
+        if (currentStep === totalSteps) {
+            document.getElementById('btn-next').classList.add('hidden');
+            document.getElementById('btn-submit').classList.remove('hidden');
+        } else {
+            document.getElementById('btn-next').classList.remove('hidden');
+            document.getElementById('btn-submit').classList.add('hidden');
+        }
+        document.getElementById('error-msg').classList.add('hidden');
+    }
+
+    function validateStep() {
+        if(currentStep === 2) {
+            const groups = [...questions.b1, ...questions.b2, ...questions.b3];
+            for (let q of groups) if(!document.querySelector(`input[name="${q.id}"]:checked`)) return false;
+        }
+        if(currentStep === 3) {
+            for (let q of questions.c) if(!document.querySelector(`input[name="${q.id}"]:checked`)) return false;
+        }
+        return true;
+    }
+
+    document.getElementById('btn-next').addEventListener('click', () => {
+        if (!validateStep()) { document.getElementById('error-msg').classList.remove('hidden'); return; }
+        if (currentStep < totalSteps) { currentStep++; updateUI(); }
+    });
+    document.getElementById('btn-prev').addEventListener('click', () => {
+        if (currentStep > 1) { currentStep--; updateUI(); }
+    });
+
+    // Form Submission
+    document.getElementById('feedbackForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        document.getElementById('loading-overlay').classList.remove('hidden');
+        
+        const formData = new FormData(e.target);
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(Object.fromEntries(formData.entries())),
+            headers: { "Content-Type": "text/plain;charset=utf-8" }
+        })
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('loading-overlay').classList.add('hidden');
+            if(data.status === "success") {
+                document.getElementById('success-overlay').classList.remove('hidden');
+                document.getElementById('nav-buttons').classList.add('hidden');
+            } else alert("Ralat: " + data.message);
+        })
+        .catch(err => {
+            document.getElementById('loading-overlay').classList.add('hidden');
+            alert("Ralat capaian internet.");
+        });
+    });
+
+    // ==========================================
+    // ROUTING & DASHBOARD ADMIN
+    // ==========================================
+    window.addEventListener('hashchange', handleRoute);
+    
+    function handleRoute() {
+        if(window.location.hash === '#admin') {
+            document.getElementById('user-view').classList.add('hidden');
+            document.getElementById('admin-view').classList.remove('hidden');
+            loadAdminData();
+        } else {
+            document.getElementById('user-view').classList.remove('hidden');
+            document.getElementById('admin-view').classList.add('hidden');
+        }
+    }
+
+    async function loadAdminData() {
+        const loading = document.getElementById('admin-loading');
+        const content = document.getElementById('admin-content');
+        loading.classList.remove('hidden');
+        content.classList.add('hidden');
+
+        try {
+            const response = await fetch(SCRIPT_URL + '?action=getData', { redirect: 'follow' });
+            const result = await response.json();
+            
+            if(result.status === 'success') {
+                globalAdminData = result.data;
+                calculateStats(result.data);
+                renderParticipantList(result.data);
+                loading.classList.add('hidden');
+                content.classList.remove('hidden');
+            } else throw new Error(result.message);
+        } catch(e) {
+            loading.innerHTML = `<div class="text-red-500 font-medium">Gagal memuat turun data: ${e.message}</div>`;
+        }
+    }
+
+    function calculateStats(data) {
+        document.getElementById('stat-total').innerText = data.length;
+        if(data.length === 0) return;
+
+        let sumB1=0, countB1=0, sumB3=0, countB3=0, sumC=0, countC=0;
+        
+        data.forEach(row => {
+            // Kalkulasi purata secara pukal berdasarkan struktur header
+            for(let key in row) {
+                let val = parseInt(row[key]);
+                if(isNaN(val)) continue;
+                
+                if(key.startsWith('B1_')) { sumB1 += val; countB1++; }
+                if(key.startsWith('B3_')) { sumB3 += val; countB3++; }
+                if(key.startsWith('C_'))  { sumC += val; countC++; }
+            }
+        });
+
+        document.getElementById('stat-b1').innerText = countB1 ? (sumB1/countB1).toFixed(2) : '0';
+        document.getElementById('stat-b3').innerText = countB3 ? (sumB3/countB3).toFixed(2) : '0';
+        document.getElementById('stat-c').innerText = countC ? (sumC/countC).toFixed(2) : '0';
+    }
+
+    function renderParticipantList(data) {
+        const list = document.getElementById('participant-list');
+        list.innerHTML = '';
+        if(data.length === 0) {
+            list.innerHTML = '<p class="text-sm text-gray-500 text-center">Tiada rekod buat masa ini.</p>';
+            return;
+        }
+
+        // Tunjuk data terbaru di atas
+        const reversedData = [...data].reverse();
+        
+        reversedData.forEach(row => {
+            let date = new Date(row.Timestamp).toLocaleDateString('ms-MY', { day: 'numeric', month: 'short', year:'numeric'});
+            list.innerHTML += `
+                <div class="p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-indigo-50 transition-colors">
+                    <div class="flex justify-between items-center mb-1">
+                        <h4 class="font-bold text-gray-800 text-sm">${row.Nama || 'Tanpa Nama'}</h4>
+                        <span class="text-xs text-gray-400">${date}</span>
+                    </div>
+                    <p class="text-xs text-indigo-600 font-medium">${row.Sekolah || 'Sekolah Tidak Dinyatakan'}</p>
+                    <p class="text-xs text-gray-500 line-clamp-1 mt-1">Subjek: ${row.Subjek}</p>
+                </div>
+            `;
+        });
+    }
+
+    // ==========================================
+    // FUNGSI ANALISIS AI (GEMINI)
+    // ==========================================
+    async function fetchWithRetry(url, options, retries = 5) {
+        const delays = [1000, 2000, 4000, 8000, 16000];
+        for (let i = 0; i < retries; i++) {
+            try {
+                const response = await fetch(url, options);
+                if (!response.ok) throw new Error(`Ralat HTTP! Status: ${response.status}`);
+                return await response.json();
+            } catch (e) {
+                if (i === retries - 1) throw e;
+                await new Promise(res => setTimeout(res, delays[i]));
+            }
+        }
+    }
+
+    document.getElementById('btn-analyze-ai').addEventListener('click', async () => {
+        if(globalAdminData.length === 0) {
+            alert('Tiada data untuk dianalisis!');
+            return;
+        }
+
+        const btn = document.getElementById('btn-analyze-ai');
+        const placeholder = document.getElementById('ai-placeholder');
+        const resultBox = document.getElementById('ai-result');
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Menganalisis Data...';
+        placeholder.classList.add('hidden');
+        resultBox.classList.remove('hidden');
+        resultBox.innerHTML = '<div class="text-center py-10"><i class="fas fa-circle-notch fa-spin text-3xl text-indigo-500 mb-3"></i><p class="text-gray-500 animate-pulse">Gemini sedang membaca dan merumus pandangan peserta...</p></div>';
+
+        // Hanya ekstrak data kualitatif dan subjek untuk elakkan payload terlalu besar
+        const simpleData = globalAdminData.map(r => ({
+            Subjek: r.Subjek,
+            Faham: r.D_PalingMudahDifahami,
+            Keliru: r.D_PalingMengelirukan,
+            Cadangan: r.D_CadanganPenambahbaikan,
+            Lanjutan: r.D_SokonganLanjutan
+        }));
+
+        const prompt = `Anda adalah penganalisis data pendidikan. Analisis data maklum balas bengkel guru (Kit NODE & AI) berikut.
+Tolong berikan laporan analitik kualitatif dalam format Markdown yang mengandungi:
+1. **Ringkasan Eksekutif** (Gambaran keseluruhan sentimen)
+2. **Kekuatan Utama Bengkel** (Apa yang guru paling suka/faham)
+3. **Cabaran & Kekeliruan Utama** (Kesukaran teknikal/kandungan yang dihadapi)
+4. **Keperluan Latihan Lanjutan** (Apakah jenis sokongan yang diminta)
+5. **Cadangan Intervensi Konkrit** (Tindakan untuk penganjur baiki bengkel)
+
+Sila tulis dalam Bahasa Melayu yang profesional, ringkas dan tersusun.
+
+Data Mentah Peserta (JSON):
+${JSON.stringify(simpleData)}`;
+
+        const payload = {
+            contents: [{ parts: [{ text: prompt }] }],
+            systemInstruction: { parts: [{ text: "Jawab dalam Bahasa Melayu profesional." }] }
+        };
+
+        try {
+            const result = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            
+            const markdownText = result.candidates?.[0]?.content?.parts?.[0]?.text || "Tiada rumusan dapat dijana.";
+            resultBox.innerHTML = marked.parse(markdownText);
+            
+        } catch (error) {
+            resultBox.innerHTML = `<div class="p-4 bg-red-100 text-red-700 rounded-lg"><i class="fas fa-exclamation-triangle mr-2"></i>Ralat Generasi AI: ${error.message}</div>`;
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-redo mr-2"></i>Jana Semula Analisis';
+        }
+    });
+
+    // Inisialisasi awal Route
+    handleRoute();
+</script>
+</body>
+</html>
