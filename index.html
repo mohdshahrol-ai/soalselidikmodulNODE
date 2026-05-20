@@ -6,7 +6,6 @@
     <title>Sistem Maklum Balas Bengkel NODE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- Pustaka untuk menukar Markdown kepada HTML bagi respons AI -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -26,13 +25,18 @@
         .likert-radio label:hover { border-color: #4f46e5; }
         .step-transition { transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; }
 
-        /* Format untuk kandungan AI */
         .ai-content h1, .ai-content h2, .ai-content h3 { font-weight: bold; color: #374151; margin-top: 1rem; margin-bottom: 0.5rem; }
         .ai-content p { margin-bottom: 0.75rem; color: #4b5563; }
         .ai-content ul, .ai-content ol { margin-left: 1.5rem; margin-bottom: 1rem; color: #4b5563; }
         .ai-content ul { list-style-type: disc; }
         .ai-content ol { list-style-type: decimal; }
         .ai-content strong { color: #111827; }
+        
+        /* Custom Scrollbar for Modal & Sections */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body class="antialiased text-gray-800">
@@ -72,7 +76,7 @@
     <!-- Form Container -->
     <div class="bg-white rounded-b-2xl shadow-md p-6 sm:p-10 relative min-h-[400px]">
         <form id="feedbackForm">
-            <!-- Langkah 1-4 (Sama seperti sebelumnya) -->
+            <!-- Langkah 1: Profil -->
             <div id="step-1" class="step-content opacity-100 transform translate-x-0">
                 <h2 class="text-xl font-semibold mb-4 text-indigo-700 border-b pb-2"><i class="fas fa-info-circle mr-2"></i>Bahagian A: Maklumat Peserta</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -99,6 +103,7 @@
                 </div>
             </div>
 
+            <!-- Langkah 2: Modul -->
             <div id="step-2" class="step-content hidden opacity-0 transform translate-x-4 absolute top-6 left-6 right-6">
                 <h2 class="text-xl font-semibold mb-2 text-indigo-700 border-b pb-2"><i class="fas fa-book-open mr-2"></i>Bahagian B: Penilaian Modul Latihan</h2>
                 <h3 class="font-medium text-gray-800 mb-4 bg-gray-100 px-3 py-2 rounded mt-4">B1: Keberkesanan Modul Latihan</h3>
@@ -109,11 +114,13 @@
                 <div class="space-y-4 mb-6" id="b3-questions"></div>
             </div>
 
+            <!-- Langkah 3: Produk -->
             <div id="step-3" class="step-content hidden opacity-0 transform translate-x-4 absolute top-6 left-6 right-6">
                 <h2 class="text-xl font-semibold mb-2 text-indigo-700 border-b pb-2"><i class="fas fa-medal mr-2"></i>Bahagian C: Kualiti Produk Akhir</h2>
                 <div class="space-y-4 mb-8 mt-4" id="c-questions"></div>
             </div>
 
+            <!-- Langkah 4: Refleksi -->
             <div id="step-4" class="step-content hidden opacity-0 transform translate-x-4 absolute top-6 left-6 right-6">
                 <h2 class="text-xl font-semibold mb-4 text-indigo-700 border-b pb-2"><i class="fas fa-comments mr-2"></i>Bahagian D: Maklum Balas Terbuka</h2>
                 <div class="space-y-4 mt-4">
@@ -164,25 +171,24 @@
         </div>
     </div>
     
-    <!-- Link to Admin -->
-    <div class="text-center mt-6">
+    <div class="text-center mt-6 mb-10">
         <a href="#admin" class="text-xs text-gray-400 hover:text-indigo-500 transition-colors"><i class="fas fa-lock mr-1"></i>Akses Admin</a>
     </div>
 </div>
 
 <!-- ========================================== -->
-<!-- PAPARAN ADMIN (DASHBOARD & AI ANALYSIS)    -->
+<!-- PAPARAN ADMIN (DASHBOARD & ANALISIS)       -->
 <!-- ========================================== -->
 <div id="admin-view" class="hidden max-w-7xl mx-auto my-8 px-4 sm:px-6">
     
     <!-- Admin Header -->
     <div class="flex justify-between items-center bg-gray-900 text-white p-6 rounded-t-2xl shadow-lg">
         <div>
-            <h1 class="text-2xl font-bold"><i class="fas fa-chart-line mr-3"></i>Dashboard Analitik Bengkel</h1>
-            <p class="text-gray-400 text-sm mt-1">Laporan Langsung & Analisis AI Gemini</p>
+            <h1 class="text-2xl font-bold"><i class="fas fa-chart-pie mr-3 text-indigo-400"></i>Dashboard Analitik Bengkel NODE</h1>
+            <p class="text-gray-400 text-sm mt-1">Laporan Langsung, Analisis Terperinci & Analisis AI</p>
         </div>
-        <a href="#" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors text-sm font-medium">
-            <i class="fas fa-home mr-2"></i>Borang Utama
+        <a href="#" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-600 rounded-lg transition-colors text-sm font-medium">
+            <i class="fas fa-arrow-left mr-2"></i>Ke Borang
         </a>
     </div>
 
@@ -196,54 +202,126 @@
     <div id="admin-content" class="hidden bg-gray-50 rounded-b-2xl shadow-lg border border-gray-200 p-6">
         
         <!-- Top Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-indigo-500">
-                <p class="text-sm text-gray-500 font-medium">Jumlah Peserta</p>
-                <p class="text-3xl font-bold text-gray-800" id="stat-total">0</p>
+                <p class="text-xs sm:text-sm text-gray-500 font-medium">Jumlah Peserta</p>
+                <p class="text-2xl sm:text-3xl font-bold text-gray-800" id="stat-total">0</p>
             </div>
             <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-500">
-                <p class="text-sm text-gray-500 font-medium">Purata: Keberkesanan Modul</p>
-                <p class="text-3xl font-bold text-gray-800" id="stat-b1">0.0</p>
+                <p class="text-xs sm:text-sm text-gray-500 font-medium">Purata Modul (B1,B2)</p>
+                <p class="text-2xl sm:text-3xl font-bold text-blue-600" id="stat-b1">0.0</p>
             </div>
             <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-green-500">
-                <p class="text-sm text-gray-500 font-medium">Purata: Pelaksanaan Fasi</p>
-                <p class="text-3xl font-bold text-gray-800" id="stat-b3">0.0</p>
+                <p class="text-xs sm:text-sm text-gray-500 font-medium">Purata Fasi (B3)</p>
+                <p class="text-2xl sm:text-3xl font-bold text-green-600" id="stat-b3">0.0</p>
             </div>
             <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-purple-500">
-                <p class="text-sm text-gray-500 font-medium">Purata: Kualiti Produk Akhir</p>
-                <p class="text-3xl font-bold text-gray-800" id="stat-c">0.0</p>
+                <p class="text-xs sm:text-sm text-gray-500 font-medium">Purata Produk (C)</p>
+                <p class="text-2xl sm:text-3xl font-bold text-purple-600" id="stat-c">0.0</p>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Left Column: AI Analysis -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- KOLUM KIRI & TENGAH: Laporan & Analisis -->
             <div class="lg:col-span-2 space-y-6">
+                
+                <!-- Analisis Terperinci Skala Likert -->
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-                    <div class="flex justify-between items-center mb-4 border-b pb-4">
-                        <h2 class="text-xl font-bold text-gray-800"><i class="fas fa-robot text-indigo-600 mr-2"></i>Analisis Kualitatif AI (Gemini)</h2>
-                        <button id="btn-analyze-ai" class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg text-sm font-bold shadow hover:opacity-90 transition">
-                            <i class="fas fa-magic mr-2"></i>Jana Laporan
+                    <h2 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2"><i class="fas fa-chart-bar text-blue-500 mr-2"></i>Analisis Terperinci (Purata Markah Item)</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="detailed-stats-container">
+                        <!-- Dijana secara dinamik melalui JS -->
+                    </div>
+                </div>
+
+                <!-- Analisis Jawapan Subjektif & AI -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 border-b pb-4 gap-4">
+                        <h2 class="text-lg font-bold text-gray-800"><i class="fas fa-comments text-purple-500 mr-2"></i>Maklum Balas Subjektif</h2>
+                        <button id="btn-analyze-ai" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg text-sm font-bold shadow hover:opacity-90 transition whitespace-nowrap">
+                            <i class="fas fa-robot mr-2"></i>Jana Rumusan AI
                         </button>
                     </div>
                     
-                    <div id="ai-placeholder" class="text-center py-12 text-gray-400">
-                        <i class="fas fa-brain text-5xl mb-4 opacity-50"></i>
-                        <p>Klik butang "Jana Laporan" untuk membiarkan Gemini Menganalisis<br>kesemua komen terbuka peserta (Bahagian D).</p>
+                    <!-- AI Result Box -->
+                    <div id="ai-result" class="hidden ai-content p-5 mb-6 bg-purple-50 rounded-xl border border-purple-100 text-sm overflow-y-auto max-h-[400px] custom-scrollbar shadow-inner">
+                        <!-- AI content -->
                     </div>
 
-                    <div id="ai-result" class="hidden ai-content p-4 bg-indigo-50/50 rounded-xl border border-indigo-100 text-sm overflow-y-auto max-h-[500px]">
-                        <!-- AI content will be injected here -->
+                    <!-- Dropdown Raw Answers -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Lihat Jawapan Penuh Mengikut Soalan:</label>
+                        <select id="subjective-filter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm mb-4">
+                            <option value="D_PalingMudahDifahami">1. Topik paling mudah & bermanfaat?</option>
+                            <option value="D_PalingMengelirukan">2. Bahagian paling mengelirukan/sukar?</option>
+                            <option value="D_CadanganPenambahbaikan">3. Cadangan penambahbaikan masa hadapan?</option>
+                            <option value="D_SokonganLanjutan">4. Sokongan / latihan lanjutan diperlukan?</option>
+                            <option value="D_KomenTambahan">5. Komen atau pandangan tambahan</option>
+                        </select>
+                        
+                        <div id="subjective-list" class="space-y-3 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
+                            <!-- Raw answers injected here -->
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column: Recent Participants List -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 overflow-y-auto max-h-[650px]">
-                <h2 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2"><i class="fas fa-list text-gray-500 mr-2"></i>Senarai Peserta</h2>
-                <div id="participant-list" class="space-y-3">
+            <!-- KOLUM KANAN: Senarai Peserta (Boleh Klik) -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 flex flex-col h-[800px]">
+                <h2 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2"><i class="fas fa-users text-green-500 mr-2"></i>Senarai Peserta</h2>
+                <p class="text-xs text-gray-500 mb-4">Klik pada nama untuk melihat maklum balas terperinci individu.</p>
+                
+                <div class="relative mb-4">
+                    <input type="text" id="search-participant" placeholder="Cari nama/sekolah..." class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <i class="fas fa-search absolute right-3 top-2.5 text-gray-400"></i>
+                </div>
+
+                <div id="participant-list" class="space-y-2 overflow-y-auto flex-grow custom-scrollbar pr-2">
                     <!-- Participant list injected here -->
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- MODAL: PAPARAN MAKLUM BALAS INDIVIDU       -->
+<!-- ========================================== -->
+<div id="individual-modal" class="hidden fixed inset-0 z-[100] bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col transform scale-95 transition-transform duration-300" id="modal-content-box">
+        
+        <!-- Header Modal -->
+        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 rounded-t-2xl">
+            <div>
+                <h3 class="text-xl font-bold text-gray-800" id="modal-nama">Nama Peserta</h3>
+                <p class="text-sm text-indigo-600 font-medium" id="modal-sekolah">Sekolah & Subjek</p>
+            </div>
+            <button onclick="closeModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 hover:bg-red-100 hover:text-red-600 transition-colors">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <!-- Body Modal -->
+        <div class="p-6 overflow-y-auto custom-scrollbar bg-white rounded-b-2xl" id="modal-body">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Kiri: Skor Likert Individu -->
+                <div>
+                    <h4 class="font-bold text-gray-800 mb-3 border-b pb-1"><i class="fas fa-tasks text-blue-500 mr-2"></i>Skor Penilaian (1-5)</h4>
+                    <div id="modal-scores" class="space-y-4">
+                        <!-- Scores injected here -->
+                    </div>
+                </div>
+                
+                <!-- Kanan: Jawapan Subjektif Individu -->
+                <div>
+                    <h4 class="font-bold text-gray-800 mb-3 border-b pb-1"><i class="fas fa-comment-dots text-purple-500 mr-2"></i>Jawapan Subjektif</h4>
+                    <div id="modal-subjective" class="space-y-4">
+                        <!-- Subjective text injected here -->
+                    </div>
+                </div>
+            </div>
+            
         </div>
     </div>
 </div>
@@ -252,10 +330,28 @@
     // ==========================================
     // KONFIGURASI SISTEM UTAMA
     // ==========================================
-    // Web App URL baharu yang diminta oleh pengguna
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby31V-8stteL7YcrEr7r0Ym6jVX9Knlrx8u02iq-_I3aeDrOES-XpFRDwh0OcQyN_Ym/exec";
-    const apiKey = ""; // Disuntik oleh persekitaran (Environment)
+    const apiKey = ""; // API Key Gemini (Inject via env)
     let globalAdminData = [];
+
+    // Map Kunci (Headers DB) ke Teks Label yang mudah dibaca
+    const itemLabels = {
+        "B1_SusunanKandungan": "Susunan Kandungan Teratur",
+        "B1_PeneranganADDIE": "Kefahaman Kerangka ADDIE",
+        "B1_PromptAI": "Contoh Prompt AI Jelas",
+        "B1_KamusTeknikal": "Kamus Teknikal (HTML/UI) Membantu",
+        "B2_ObjektifJelas": "Objektif Bengkel Jelas",
+        "B2_RelevanDwiMod": "Relevan dengan Isu Dwi-Mod",
+        "B2_AIPercepatTugas": "AI Mempercepatkan Persediaan PdP",
+        "B3_MasaMencukupi": "Peruntukan Masa 2 Hari Mencukupi",
+        "B3_BimbinganFasi": "Bimbingan Fasilitator Berkesan",
+        "C_PenjajaranDSKP": "Penjajaran DSKP Tepat",
+        "C_KesesuaianDwiMod": "Kesesuaian Offline/Unplugged",
+        "C_KomponenModul": "Komponen HTML Berjaya Dibina",
+        "C_PenyatuanSistem": "Penyatuan Sistem (Single-File)",
+        "C_PengurusanData": "Pengurusan Data (JSON) Berfungsi",
+        "C_Kebolehlaksanaan": "Kebolehlaksanaan Praktikal"
+    };
 
     // ==========================================
     // LOGIK BORANG (PAPARAN PENGGUNA)
@@ -290,7 +386,7 @@
         const container = document.getElementById(containerId);
         dataArray.forEach((q, index) => {
             let html = `
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-white border border-gray-200 shadow-sm rounded-xl">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-white border border-gray-200 shadow-sm rounded-xl hover:border-indigo-300 transition-colors">
                     <p class="text-sm text-gray-700 sm:w-1/2 mb-3 sm:mb-0">${index + 1}. ${q.text}</p>
                     <div class="flex justify-end space-x-2 likert-radio">
             `;
@@ -370,15 +466,27 @@
         if (currentStep > 1) { currentStep--; updateUI(); }
     });
 
-    // Form Submission
     document.getElementById('feedbackForm').addEventListener('submit', (e) => {
         e.preventDefault();
         document.getElementById('loading-overlay').classList.remove('hidden');
-        
         const formData = new FormData(e.target);
+        
+        // Pemetaan ID HTML form kepada Header DB Backend
+        const dataObj = {
+            nama: formData.get('nama'),
+            sekolah: formData.get('sekolah'),
+            kategori_sekolah: formData.get('kategori_sekolah'),
+            subjek: formData.get('subjek'),
+            b1_1: formData.get('b1_1'), b1_2: formData.get('b1_2'), b1_3: formData.get('b1_3'), b1_4: formData.get('b1_4'),
+            b2_1: formData.get('b2_1'), b2_2: formData.get('b2_2'), b2_3: formData.get('b2_3'),
+            b3_1: formData.get('b3_1'), b3_2: formData.get('b3_2'),
+            c_1: formData.get('c_1'), c_2: formData.get('c_2'), c_3: formData.get('c_3'), c_4: formData.get('c_4'), c_5: formData.get('c_5'), c_6: formData.get('c_6'),
+            d_1: formData.get('d_1'), d_2: formData.get('d_2'), d_3: formData.get('d_3'), d_4: formData.get('d_4'), d_5: formData.get('d_5')
+        };
+
         fetch(SCRIPT_URL, {
             method: 'POST',
-            body: JSON.stringify(Object.fromEntries(formData.entries())),
+            body: JSON.stringify(dataObj),
             headers: { "Content-Type": "text/plain;charset=utf-8" }
         })
         .then(r => r.json())
@@ -422,64 +530,237 @@
             const result = await response.json();
             
             if(result.status === 'success') {
-                globalAdminData = result.data;
-                calculateStats(result.data);
-                renderParticipantList(result.data);
+                // Simpan original index untuk rujukan Modal nanti
+                globalAdminData = result.data.map((item, idx) => ({ ...item, _rawIndex: idx }));
+                
+                calculateTopStats(globalAdminData);
+                renderDetailedStats(globalAdminData);
+                renderSubjectiveAnswers(globalAdminData);
+                renderParticipantList(globalAdminData);
+                
                 loading.classList.add('hidden');
                 content.classList.remove('hidden');
             } else throw new Error(result.message);
         } catch(e) {
-            loading.innerHTML = `<div class="text-red-500 font-medium">Gagal memuat turun data: ${e.message}</div>`;
+            loading.innerHTML = `<div class="text-red-500 font-medium p-6">Gagal memuat turun data: ${e.message}</div>`;
         }
     }
 
-    function calculateStats(data) {
+    // --- 1. Kalkulasi Top Stats ---
+    function calculateTopStats(data) {
         document.getElementById('stat-total').innerText = data.length;
         if(data.length === 0) return;
 
-        let sumB1=0, countB1=0, sumB3=0, countB3=0, sumC=0, countC=0;
+        let sumB1B2=0, countB1B2=0, sumB3=0, countB3=0, sumC=0, countC=0;
         
         data.forEach(row => {
-            // Kalkulasi purata secara pukal berdasarkan struktur header
             for(let key in row) {
-                let val = parseInt(row[key]);
+                let val = parseFloat(row[key]);
                 if(isNaN(val)) continue;
                 
-                if(key.startsWith('B1_')) { sumB1 += val; countB1++; }
+                if(key.startsWith('B1_') || key.startsWith('B2_')) { sumB1B2 += val; countB1B2++; }
                 if(key.startsWith('B3_')) { sumB3 += val; countB3++; }
                 if(key.startsWith('C_'))  { sumC += val; countC++; }
             }
         });
 
-        document.getElementById('stat-b1').innerText = countB1 ? (sumB1/countB1).toFixed(2) : '0';
+        document.getElementById('stat-b1').innerText = countB1B2 ? (sumB1B2/countB1B2).toFixed(2) : '0';
         document.getElementById('stat-b3').innerText = countB3 ? (sumB3/countB3).toFixed(2) : '0';
         document.getElementById('stat-c').innerText = countC ? (sumC/countC).toFixed(2) : '0';
     }
 
-    function renderParticipantList(data) {
-        const list = document.getElementById('participant-list');
-        list.innerHTML = '';
-        if(data.length === 0) {
-            list.innerHTML = '<p class="text-sm text-gray-500 text-center">Tiada rekod buat masa ini.</p>';
-            return;
+    // --- 2. Analisis Terperinci Skala Likert (Progress Bars) ---
+    function renderDetailedStats(data) {
+        const container = document.getElementById('detailed-stats-container');
+        container.innerHTML = '';
+        if(data.length === 0) return;
+
+        // Group the keys for UI columns
+        const groupModul = ["B1_SusunanKandungan", "B1_PeneranganADDIE", "B1_PromptAI", "B1_KamusTeknikal", "B2_ObjektifJelas", "B2_RelevanDwiMod", "B2_AIPercepatTugas"];
+        const groupFasiProduk = ["B3_MasaMencukupi", "B3_BimbinganFasi", "C_PenjajaranDSKP", "C_KesesuaianDwiMod", "C_KomponenModul", "C_PenyatuanSistem", "C_PengurusanData", "C_Kebolehlaksanaan"];
+
+        function getAvg(key) {
+            let sum = 0, count = 0;
+            data.forEach(r => { let v = parseFloat(r[key]); if(!isNaN(v)){ sum+=v; count++; } });
+            return count ? (sum/count).toFixed(2) : 0;
         }
 
-        // Tunjuk data terbaru di atas
-        const reversedData = [...data].reverse();
+        function createColumn(title, keys, colorClass) {
+            let html = `<div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                            <h3 class="font-bold text-gray-700 mb-3 text-sm">${title}</h3>
+                            <div class="space-y-4">`;
+            keys.forEach(key => {
+                let avg = getAvg(key);
+                let pct = (avg / 5) * 100;
+                let barColor = pct >= 80 ? 'bg-green-500' : pct >= 60 ? 'bg-yellow-500' : 'bg-red-500';
+                
+                html += `<div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-gray-600 truncate pr-2" title="${itemLabels[key]}">${itemLabels[key]}</span>
+                                <span class="font-bold ${colorClass}">${avg}/5.0</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-1.5">
+                                <div class="${barColor} h-1.5 rounded-full" style="width: ${pct}%"></div>
+                            </div>
+                        </div>`;
+            });
+            html += `</div></div>`;
+            return html;
+        }
+
+        container.innerHTML += createColumn("Modul Latihan (B1 & B2)", groupModul, "text-blue-600");
+        container.innerHTML += createColumn("Fasilitator & Produk (B3 & C)", groupFasiProduk, "text-purple-600");
+    }
+
+    // --- 3. Analisis Maklum Balas Subjektif ---
+    function renderSubjectiveAnswers(data) {
+        const filterEl = document.getElementById('subjective-filter');
+        const listEl = document.getElementById('subjective-list');
         
-        reversedData.forEach(row => {
-            let date = new Date(row.Timestamp).toLocaleDateString('ms-MY', { day: 'numeric', month: 'short', year:'numeric'});
-            list.innerHTML += `
-                <div class="p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-indigo-50 transition-colors">
-                    <div class="flex justify-between items-center mb-1">
-                        <h4 class="font-bold text-gray-800 text-sm">${row.Nama || 'Tanpa Nama'}</h4>
-                        <span class="text-xs text-gray-400">${date}</span>
+        function updateList() {
+            const selectedKey = filterEl.value;
+            listEl.innerHTML = '';
+            
+            let count = 0;
+            // Iterate reverse to show newest first
+            [...data].reverse().forEach(row => {
+                const answer = row[selectedKey];
+                if(answer && answer.trim() !== '') {
+                    count++;
+                    listEl.innerHTML += `
+                        <div class="p-3 bg-white border border-gray-200 rounded-lg shadow-sm text-sm">
+                            <p class="text-gray-800 italic">"${answer}"</p>
+                            <p class="text-xs text-indigo-500 mt-2 font-medium">- ${row.Nama || 'Tanpa Nama'} (${row.Sekolah || 'Sekolah Tidak Dinyatakan'})</p>
+                        </div>
+                    `;
+                }
+            });
+
+            if(count === 0) {
+                listEl.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">Tiada jawapan bertulis direkodkan untuk bahagian ini.</p>';
+            }
+        }
+
+        filterEl.addEventListener('change', updateList);
+        updateList(); // init
+    }
+
+    // --- 4. Senarai Peserta & Modal Maklum Balas Individu ---
+    function renderParticipantList(data) {
+        const list = document.getElementById('participant-list');
+        const searchInput = document.getElementById('search-participant');
+        
+        function updateList(searchTerm = '') {
+            list.innerHTML = '';
+            const filteredData = data.filter(row => {
+                const term = searchTerm.toLowerCase();
+                const nama = (row.Nama || '').toLowerCase();
+                const sekolah = (row.Sekolah || '').toLowerCase();
+                return nama.includes(term) || sekolah.includes(term);
+            });
+
+            if(filteredData.length === 0) {
+                list.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">Tiada rekod ditemui.</p>';
+                return;
+            }
+
+            // Tunjuk data terbaru di atas
+            [...filteredData].reverse().forEach(row => {
+                let date = new Date(row.Timestamp).toLocaleDateString('ms-MY', { day: 'numeric', month: 'short'});
+                // Guna _rawIndex untuk panggil data tepat apabila diklik
+                list.innerHTML += `
+                    <div onclick="openModal(${row._rawIndex})" class="p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-indigo-50 hover:border-indigo-300 transition-colors cursor-pointer group">
+                        <div class="flex justify-between items-center mb-1">
+                            <h4 class="font-bold text-gray-800 text-sm group-hover:text-indigo-700">${row.Nama || 'Tanpa Nama'}</h4>
+                            <span class="text-xs text-gray-400">${date}</span>
+                        </div>
+                        <p class="text-xs text-indigo-600 font-medium">${row.Sekolah || 'Sekolah Tidak Dinyatakan'}</p>
+                        <p class="text-[11px] text-gray-500 line-clamp-1 mt-1">Subjek: ${row.Subjek || '-'}</p>
                     </div>
-                    <p class="text-xs text-indigo-600 font-medium">${row.Sekolah || 'Sekolah Tidak Dinyatakan'}</p>
-                    <p class="text-xs text-gray-500 line-clamp-1 mt-1">Subjek: ${row.Subjek}</p>
-                </div>
-            `;
+                `;
+            });
+        }
+
+        searchInput.addEventListener('input', (e) => updateList(e.target.value));
+        updateList(); // init
+    }
+
+    // --- Modal Logic ---
+    function openModal(rawIndex) {
+        const row = globalAdminData.find(r => r._rawIndex === rawIndex);
+        if(!row) return;
+
+        document.getElementById('modal-nama').innerText = row.Nama || 'Tanpa Nama';
+        document.getElementById('modal-sekolah').innerText = `${row.Sekolah || 'Sekolah Tidak Dinyatakan'} | ${row.Subjek || 'Subjek Umum'}`;
+        
+        // Render Scores (Grouped)
+        const scoreContainer = document.getElementById('modal-scores');
+        scoreContainer.innerHTML = '';
+        
+        const groups = [
+            { title: "B1: Modul Latihan", keys: ["B1_SusunanKandungan", "B1_PeneranganADDIE", "B1_PromptAI", "B1_KamusTeknikal"] },
+            { title: "B2 & B3: Objektif & Fasilitator", keys: ["B2_ObjektifJelas", "B2_RelevanDwiMod", "B2_AIPercepatTugas", "B3_MasaMencukupi", "B3_BimbinganFasi"] },
+            { title: "C: Kualiti Produk Akhir", keys: ["C_PenjajaranDSKP", "C_KesesuaianDwiMod", "C_KomponenModul", "C_PenyatuanSistem", "C_PengurusanData", "C_Kebolehlaksanaan"] }
+        ];
+
+        groups.forEach(g => {
+            let html = `<div class="bg-gray-50 p-3 rounded-lg border border-gray-200 mb-3"><h5 class="text-xs font-bold text-gray-700 mb-2 border-b pb-1">${g.title}</h5>`;
+            g.keys.forEach(k => {
+                let val = row[k] || '-';
+                let color = val >= 4 ? 'text-green-600' : val == 3 ? 'text-yellow-600' : 'text-red-600';
+                html += `<div class="flex justify-between text-xs mb-1">
+                            <span class="text-gray-600 w-3/4 truncate pr-2" title="${itemLabels[k]}">${itemLabels[k]}</span>
+                            <span class="font-bold ${color}">${val} / 5</span>
+                         </div>`;
+            });
+            html += `</div>`;
+            scoreContainer.innerHTML += html;
         });
+
+        // Render Subjective
+        const subjContainer = document.getElementById('modal-subjective');
+        subjContainer.innerHTML = '';
+        const subjKeys = [
+            { key: "D_PalingMudahDifahami", label: "1. Mudah Difahami / Bermanfaat" },
+            { key: "D_PalingMengelirukan", label: "2. Paling Mengelirukan / Sukar" },
+            { key: "D_CadanganPenambahbaikan", label: "3. Cadangan Penambahbaikan" },
+            { key: "D_SokonganLanjutan", label: "4. Keperluan Lanjutan" },
+            { key: "D_KomenTambahan", label: "5. Komen Tambahan" }
+        ];
+
+        subjKeys.forEach(s => {
+            let ans = row[s.key];
+            if(ans && ans.trim() !== '') {
+                subjContainer.innerHTML += `
+                    <div class="mb-3">
+                        <p class="text-xs font-bold text-indigo-700 mb-1">${s.label}</p>
+                        <p class="text-sm text-gray-700 bg-indigo-50 p-3 rounded-lg border border-indigo-100 italic">"${ans}"</p>
+                    </div>
+                `;
+            }
+        });
+        if(subjContainer.innerHTML === '') subjContainer.innerHTML = '<p class="text-sm text-gray-500 italic">Peserta tidak meninggalkan maklum balas bertulis.</p>';
+
+        // Show Modal with animation
+        const modal = document.getElementById('individual-modal');
+        const box = document.getElementById('modal-content-box');
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            box.classList.remove('scale-95');
+            box.classList.add('scale-100');
+        }, 10);
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('individual-modal');
+        const box = document.getElementById('modal-content-box');
+        modal.classList.add('opacity-0');
+        box.classList.remove('scale-100');
+        box.classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
     }
 
     // ==========================================
@@ -506,36 +787,29 @@
         }
 
         const btn = document.getElementById('btn-analyze-ai');
-        const placeholder = document.getElementById('ai-placeholder');
         const resultBox = document.getElementById('ai-result');
 
         btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Menganalisis Data...';
-        placeholder.classList.add('hidden');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Menganalisis...';
         resultBox.classList.remove('hidden');
-        resultBox.innerHTML = '<div class="text-center py-10"><i class="fas fa-circle-notch fa-spin text-3xl text-indigo-500 mb-3"></i><p class="text-gray-500 animate-pulse">Gemini sedang membaca dan merumus pandangan peserta...</p></div>';
+        resultBox.innerHTML = '<div class="text-center py-8"><i class="fas fa-circle-notch fa-spin text-3xl text-purple-500 mb-3"></i><p class="text-purple-700 animate-pulse font-medium">Gemini sedang membaca dan merumus pandangan subjektif peserta...</p></div>';
 
-        // Hanya ekstrak data kualitatif dan subjek untuk elakkan payload terlalu besar
         const simpleData = globalAdminData.map(r => ({
-            Subjek: r.Subjek,
             Faham: r.D_PalingMudahDifahami,
             Keliru: r.D_PalingMengelirukan,
             Cadangan: r.D_CadanganPenambahbaikan,
             Lanjutan: r.D_SokonganLanjutan
         }));
 
-        const prompt = `Anda adalah penganalisis data pendidikan. Analisis data maklum balas bengkel guru (Kit NODE & AI) berikut.
-Tolong berikan laporan analitik kualitatif dalam format Markdown yang mengandungi:
-1. **Ringkasan Eksekutif** (Gambaran keseluruhan sentimen)
-2. **Kekuatan Utama Bengkel** (Apa yang guru paling suka/faham)
-3. **Cabaran & Kekeliruan Utama** (Kesukaran teknikal/kandungan yang dihadapi)
-4. **Keperluan Latihan Lanjutan** (Apakah jenis sokongan yang diminta)
-5. **Cadangan Intervensi Konkrit** (Tindakan untuk penganjur baiki bengkel)
+        const prompt = `Anda penganalisis data. Analisis maklum balas bengkel ini.
+Berikan laporan dalam Markdown:
+1. **Ringkasan Sentimen Keseluruhan**
+2. **Kekuatan Utama Bengkel**
+3. **Cabaran & Isu Teknikal Utama**
+4. **Cadangan Tindakan Lanjutan Penganjur**
 
-Sila tulis dalam Bahasa Melayu yang profesional, ringkas dan tersusun.
-
-Data Mentah Peserta (JSON):
-${JSON.stringify(simpleData)}`;
+Tulis ringkas, profesional dalam Bahasa Melayu.
+Data: ${JSON.stringify(simpleData)}`;
 
         const payload = {
             contents: [{ parts: [{ text: prompt }] }],
@@ -553,14 +827,14 @@ ${JSON.stringify(simpleData)}`;
             resultBox.innerHTML = marked.parse(markdownText);
             
         } catch (error) {
-            resultBox.innerHTML = `<div class="p-4 bg-red-100 text-red-700 rounded-lg"><i class="fas fa-exclamation-triangle mr-2"></i>Ralat Generasi AI: ${error.message}</div>`;
+            resultBox.innerHTML = `<div class="p-4 bg-red-100 text-red-700 rounded-lg"><i class="fas fa-exclamation-triangle mr-2"></i>Ralat AI: ${error.message}</div>`;
         } finally {
             btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-redo mr-2"></i>Jana Semula Analisis';
+            btn.innerHTML = '<i class="fas fa-redo mr-2"></i>Jana Semula AI';
         }
     });
 
-    // Inisialisasi awal Route
+    // Init
     handleRoute();
 </script>
 </body>
